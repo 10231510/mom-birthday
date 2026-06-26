@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>给妈妈的生日礼物 🌹</title>
+    <style>
+        /* ===== 全局重置 & 温馨配色 ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+            background: #fcf5ed;
+            color: #5a4a3a;
+            padding: 20px 15px 50px;
+            max-width: 800px;
+            margin: 0 auto;
+            overflow-x: hidden;
+        }
+        /* ===== 顶部标题 ===== */
+        .header {
+            text-align: center;
+            padding: 10px 0 20px;
+        }
+        .header h1 {
+            font-size: 2.4rem;
+            font-weight: 700;
+            color: #d4837a;
+            text-shadow: 2px 2px 0 #f0d5cc;
+            letter-spacing: 6px;
+        }
+        .header p {
+            font-size: 1rem;
+            color: #b38b7c;
+            margin-top: 8px;
+            letter-spacing: 2px;
+        }
+        .divider {
+            width: 80px;
+            height: 3px;
+            background: linear-gradient(to right, #f0c8b8, #d4837a, #f0c8b8);
+            margin: 10px auto 0;
+            border-radius: 2px;
+        }
+
+        /* ===== 信封交互模块（顶部封面） ===== */
+        .envelope-container {
+            margin: 15px 0 25px;
+            display: flex;
+            justify-content: center;
+            cursor: pointer;
+            perspective: 800px;
+        }
+        .envelope {
+            width: 100%;
+            max-width: 450px;
+            aspect-ratio: 1.4 / 1;
+            background: #f5e8df;
+            border-radius: 16px;
+            position: relative;
+            box-shadow: 0 20px 40px rgba(160, 120, 100, 0.25);
+            border: 2px solid #e6d3c8;
+            transition: box-shadow 0.4s ease;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .envelope-hint {
+            text-align: center;
+            color: #b08878;
+            z-index: 25;  /* 修复：调高让文字显示在封口之上 */
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+        }
+        .envelope-hint span {
+            font-size: 4rem;
+            display: block;
+            margin-bottom: 6px;
+        }
+        .envelope-hint p {
+            font-size: 1rem;
+            background: rgba(255, 255, 255, 0.6);
+            padding: 4px 18px;
+            border-radius: 50px;
+            backdrop-filter: blur(2px);
+            font-weight: 500;
+            letter-spacing: 2px;
+        }
+        .flap {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #eddcd2;
+            clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 65%, 0 100%);
+            transform-origin: top center;
+            transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 20;
+            border-bottom: 2px dashed #dcc8bc;
+        }
+        .letter-paper {
+            position: absolute;
+            bottom: 0;
+            left: 8%;
+            width: 84%;
+            height: 75%;
+            background: #fffcf9;
+            border-radius: 12px 12px 6px 6px;
+            padding: 22px 18px;
+            box-shadow: 0 8px 25px rgba(80, 50, 40, 0.12);
+            transform: translateY(110%);
+            transition: transform 0.7s cubic-bezier(0.34, 1.2, 0.64, 1) 0.15s;
+            overflow-y: auto;
+            border: 1px solid #f0e3db;
+            z-index: 15;
+        }
+        .letter-paper-content {
+            font-size: 0.95rem;
+            line-height: 1.9;
+            color: #4d3e34;
+            white-space: pre-wrap;
+            word-break: break-word;
+            font-family: "KaiTi", "楷体", "STKaiti", serif;
+            height: 100%;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+        .letter-paper-content .cursor-blink {
+            display: inline-block;
+            width: 2px;
+            height: 1.1em;
+            background: #d4837a;
+            margin-left: 2px;
+            vertical-align: text-bottom;
+            animation: blink 0.8s step-end infinite;
+        }
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+        .envelope.open {
+            box-shadow: 0 25px 50px rgba(160, 120, 100, 0.3);
+        }
+        .envelope.open .flap {
+            transform: rotateX(180deg);
+        }
+        .envelope.open .letter-paper {
+            transform: translateY(0);
+        }
+        .envelope.open .envelope-hint {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* ===== 内容卡片通用样式 ===== */
+        .section {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(4px);
+            border-radius: 30px;
+            padding: 20px 15px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 25px rgba(160, 120, 100, 0.10);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #d4837a;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            padding-left: 5px;
+        }
+        .section-title span {
+            background: #d4837a;
+            color: white;
+            font-size: 0.8rem;
+            border-radius: 50px;
+            padding: 0 12px;
+            line-height: 24px;
+        }
+
+        /* ===== 视频 ===== */
+        video {
+            width: 100%;
+            border-radius: 18px;
+            display: block;
+            background: #1a1a1a;
+            outline: none;
+        }
+
+        /* ===== 互动按钮 ===== */
+        .interact-row {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin: 10px 0 5px;
+        }
+        .interact-btn {
+            background: white;
+            border: none;
+            padding: 12px 28px;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: #5a4a3a;
+            box-shadow: 0 4px 12px rgba(160, 120, 100, 0.15);
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.8);
+        }
+        .interact-btn:active {
+            transform: translateY(2px);
+        }
+        .btn-pink { background: #fce4e0; color: #c26b62; }
+        .btn-gold { background: #fcf0e0; color: #b88a5e; }
+
+        .candle-area {
+            text-align: center;
+            font-size: 4rem;
+            margin: 15px 0 10px;
+            line-height: 1.4;
+            transition: all 0.5s;
+        }
+        .candle-sub {
+            font-size: 1rem;
+            color: #b38b7c;
+            margin-top: -5px;
+        }
+
+        /* ===== 底部 ===== */
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            font-size: 0.9rem;
+            color: #c2aaa0;
+            letter-spacing: 2px;
+            border-top: 1px dashed #e6d6ce;
+            padding-top: 25px;
+        }
+
+        /* ===== 花瓣特效容器 ===== */
+        #fireworks-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 99999;
+            overflow: hidden;
+        }
+        .petal {
+            position: absolute;
+            font-size: 24px;
+            animation: fall linear forwards;
+            opacity: 0.9;
+        }
+        @keyframes fall {
+            0% { transform: translateY(-20px) rotate(0deg) scale(0.8); opacity: 0.9; }
+            100% { transform: translateY(110vh) rotate(720deg) scale(1.2); opacity: 0.2; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 花瓣特效容器 -->
+    <div id="fireworks-container"></div>
+
+    <!-- ===== 顶部标题 ===== -->
+    <div class="header">
+        <h1>🌷 生日快乐</h1>
+        <p>给我的超级妈妈</p>
+        <div class="divider"></div>
+    </div>
+
+    <!-- ===== 1. 点击展开信封（代替封面图） ===== -->
+    <div class="envelope-container" id="envelopeContainer">
+        <div class="envelope" id="envelope">
+            <div class="flap"></div>
+            <div class="letter-paper">
+                <div class="letter-paper-content" id="letterContentDisplay">
+                    <span class="cursor-blink"></span>
+                </div>
+            </div>
+            <div class="envelope-hint">
+                <span>💌</span>
+                <p>点我拆开信封</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 2. 视频区 ===== -->
+    <div class="section">
+        <div class="section-title">📹 我们的时光电影 <span>点击播放</span></div>
+        <!-- ★★★ 如果你的视频文件名不是 video.mp4，请修改下面的 src ★★★ -->
+        <video id="mainVideo" controls playsinline>
+            <source src="video.mp4" type="video/mp4">
+            您的浏览器不支持视频播放。
+        </video>
+    </div>
+
+    <!-- ===== 3. 互动区（花瓣 + 蜡烛） ===== -->
+    <div class="section">
+        <div class="section-title">✨ 给你的惊喜</div>
+        <div class="interact-row">
+            <button class="interact-btn btn-pink" id="fireworkBtn">🌸 放满天花瓣</button>
+            <button class="interact-btn btn-gold" id="candleBtn">🕯️ 吹蜡烛</button>
+        </div>
+        <div class="candle-area" id="candleDisplay">
+            🕯️
+            <div class="candle-sub">点击“吹蜡烛”许个愿吧</div>
+        </div>
+    </div>
+
+    <!-- ===== 底部 ===== -->
+    <div class="footer">
+        ❤️ 永远爱你的宝贝们 ❤️
+        <br><span style="font-size:0.75rem;">—— 这是一份永远会更新的生日礼物 ——</span>
+    </div>
+
+    <script>
+        // ============================================================
+        //  1. 信封交互 + 打字机效果
+        // ============================================================
+        const envelopeContainer = document.getElementById('envelopeContainer');
+        const envelope = document.getElementById('envelope');
+        const letterContentDisplay = document.getElementById('letterContentDisplay');
+        let isEnvelopeOpened = false;
+        let isTypingStarted = false;
+        let charIndex = 0;
+
+        // ★★★ 重要：在这里修改你写给妈妈的信（支持换行） ★★★
+        const letterContent = `妈妈：
+
+生日快乐！这封信藏在一个信封里，就像我有些话一直藏在心里。
+
+以前总觉得爱不用说出口，可现在我明白了，爱要让你看见、听见。
+你是我见过最温柔、最坚强的人。
+
+以前你牵着我走，以后换我牵着你。
+你不需要做超人，做我最爱的妈妈就好。
+
+—— 永远爱你的宝贝`;
+
+        // 点击信封
+        envelopeContainer.addEventListener('click', function() {
+            if (!isEnvelopeOpened) {
+                envelope.classList.add('open');
+                isEnvelopeOpened = true;
+                setTimeout(function() {
+                    if (!isTypingStarted) {
+                        startTyping();
+                    }
+                }, 750);
+            } else {
+                envelope.classList.remove('open');
+                isEnvelopeOpened = false;
+                setTimeout(function() {
+                    const cursor = letterContentDisplay.querySelector('.cursor-blink');
+                    letterContentDisplay.innerHTML = '';
+                    letterContentDisplay.appendChild(cursor);
+                    charIndex = 0;
+                    isTypingStarted = false;
+                }, 400);
+            }
+        });
+
+        function startTyping() {
+            if (isTypingStarted) return;
+            isTypingStarted = true;
+            const cursor = letterContentDisplay.querySelector('.cursor-blink');
+            if (!cursor) {
+                const newCursor = document.createElement('span');
+                newCursor.className = 'cursor-blink';
+                letterContentDisplay.appendChild(newCursor);
+            }
+            function typeNextChar() {
+                if (charIndex < letterContent.length) {
+                    const cursorSpan = letterContentDisplay.querySelector('.cursor-blink');
+                    const textNode = document.createTextNode(letterContent.charAt(charIndex));
+                    letterContentDisplay.insertBefore(textNode, cursorSpan);
+                    charIndex++;
+                    setTimeout(typeNextChar, 50);
+                }
+            }
+            typeNextChar();
+        }
+
+        // ============================================================
+        //  2. 花瓣特效
+        // ============================================================
+        const fireworkBtn = document.getElementById('fireworkBtn');
+        const container = document.getElementById('fireworks-container');
+        let petalInterval = null;
+
+        function createPetal() {
+            const emojis = ['🌸', '🌺', '🌷', '❤️', '💖', '✨', '🦋'];
+            const el = document.createElement('div');
+            el.classList.add('petal');
+            el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+            el.style.fontSize = (20 + Math.random() * 28) + 'px';
+            el.style.left = Math.random() * 100 + '%';
+            el.style.animationDuration = (4 + Math.random() * 4) + 's';
+            container.appendChild(el);
+            setTimeout(() => { if (el.parentNode) el.remove(); }, 8000);
+        }
+
+        fireworkBtn.addEventListener('click', function() {
+            if (petalInterval) {
+                clearInterval(petalInterval);
+                petalInterval = null;
+                container.innerHTML = '';
+                fireworkBtn.textContent = '🌸 放满天花瓣';
+                return;
+            }
+            container.innerHTML = '';
+            for (let i = 0; i < 20; i++) {
+                setTimeout(createPetal, i * 80);
+            }
+            petalInterval = setInterval(createPetal, 300);
+            fireworkBtn.textContent = '⏹️ 停止花瓣雨';
+            setTimeout(() => {
+                if (petalInterval) {
+                    clearInterval(petalInterval);
+                    petalInterval = null;
+                    fireworkBtn.textContent = '🌸 放满天花瓣';
+                }
+            }, 15000);
+        });
+
+        // ============================================================
+        //  3. 吹蜡烛
+        // ============================================================
+        const candleBtn = document.getElementById('candleBtn');
+        const candleDisplay = document.getElementById('candleDisplay');
+        let candleState = 'lit';
+
+        candleBtn.addEventListener('click', function() {
+            if (candleState === 'lit') {
+                candleDisplay.innerHTML = `💨<div class="candle-sub">🎂 妈妈生日快乐！愿望都会实现！</div>`;
+                candleState = 'blown';
+                candleBtn.textContent = '🕯️ 重新点燃蜡烛';
+                for (let i = 0; i < 8; i++) {
+                    setTimeout(createPetal, i * 100);
+                }
+            } else {
+                candleDisplay.innerHTML = `🕯️<div class="candle-sub">点击“吹蜡烛”许个愿吧</div>`;
+                candleState = 'lit';
+                candleBtn.textContent = '🕯️ 吹蜡烛';
+            }
+        });
+
+        console.log('🎁 礼物加载完毕，祝妈妈生日快乐！');
+    </script>
+</body>
+</html>
